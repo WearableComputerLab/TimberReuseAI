@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
+using UnityEngine.Assertions.Must;
 using UnityEngine.Networking;
 
 public class ChatGPTImage : MonoBehaviour
@@ -18,6 +19,8 @@ public class ChatGPTImage : MonoBehaviour
 
     public Texture2D inputImage;
 
+    private Texture2D generatedImage;
+
 
     // Start is called before the first frame update
     void Start()
@@ -25,6 +28,8 @@ public class ChatGPTImage : MonoBehaviour
         // Load an image from your resources (make sure to place the image in the Resources folder)
         // Texture2D image = Resources.Load<Texture2D>("path_to_your_image");
         StartCoroutine(SendImageToChatGPT(inputImage));
+
+        // StartCoroutine(DisplayGenerativeImage());
     }
 
 
@@ -60,9 +65,13 @@ public class ChatGPTImage : MonoBehaviour
 
                 Debug.Log("Image URL: " + imageUrl);
 
-                SaveTextureAsPNG(ConvertBase64ToTexture(imageUrl));
+                generatedImage = ConvertBase64ToTexture(imageUrl);
 
-                yield return StartCoroutine(DownloadImage(imageUrl));
+                SaveTextureAsPNG(generatedImage);
+
+                DisplayGenerativeImage();
+
+                // yield return StartCoroutine(DownloadImage(imageUrl));
 
                 // if (jsonResponse["data"][0].Contains("url"))
                 // {
@@ -92,6 +101,22 @@ public class ChatGPTImage : MonoBehaviour
         }
     }
 
+
+    void DisplayGenerativeImage()
+    {
+        Renderer renderer = GameObject.Find("GenerativeDesign").GetComponent<Renderer>();
+
+        // Material material = Resources.Load<Material>("Image/image");
+
+        renderer.material.mainTexture = generatedImage;
+
+        // renderer.material = material;
+
+        // yield return null; // Ensures the coroutine actually yields
+    }
+
+
+
     // Coroutine to download the generated image
     private IEnumerator DownloadImage(string imageUrl)
     {
@@ -114,7 +139,7 @@ public class ChatGPTImage : MonoBehaviour
 
     public void SaveTextureAsPNG(Texture2D texture)
     {
-        string path = Application.persistentDataPath + "/SavedTexture.png";
+        string path = Application.dataPath + "/Image/SavedImage.png";
 
         byte[] bytes = texture.EncodeToPNG(); // Encode texture into PNG
         File.WriteAllBytes(path, bytes); // Write to a file
@@ -138,30 +163,22 @@ public class ChatGPTImage : MonoBehaviour
     }
 
 
-    // string CreateJsonPayload(string base64Image)
-    // {
-    //     return $@"{{
-    //         ""model"": ""dall-e-3"",
-    //         ""messages"": [
-    //             {{
-    //                 ""role"": ""user"",
-    //                 ""content"": [
-    //                     {{
-    //                         ""type"": ""text"",
-    //                         ""text"": ""Can you design furniture and give me the image of your designed furniture?""
-    //                     }},
-    //                     {{
-    //                         ""type"": ""image_url"",
-    //                         ""image_url"": {{
-    //                             ""url"": ""data:image/jpeg;base64,{base64Image}""
-    //                         }}
-    //                     }}
-    //                 ]
-    //             }}
-    //         ],
-    //         ""max_tokens"": 300
-    //     }}";
-    // }
+    string CreateJsonPayload(string base64Image)
+    {
+        JObject payload = new JObject
+        {
+            ["model"] = "dall-e-3",
+            // ["prompt"] = "Generate a white cat",
+            ["prompt"] = "There are nine waste timbers in the image: Cube7(15cm * 10cm * 48cm), Cube(10cm * 8cm * 153cm), Cube1(20cm * 7cm * 225cm), Cube7(15cm * 10cm * 48cm), Cube8(50cm * 12cm * 130cm), Cube9(22cm * 6cm * 35cm), Cube6(26cm * 14cm * 117cm), Cube2(18cm * 7cm * 150cm), Cube4(40cm * 18cm * 52cm), and Cube5(33cm * 10cm * 25cm). Can you design furniture based on these timber cubes and generate an image of your designed furniture with assembling instructions",
+            ["size"] = "1024x1024",
+            ["quality"] = "standard",
+            ["response_format"] = "b64_json",
+            ["n"] = 1
+        };
+        return payload.ToString();
+    }
+
+
 
     // string CreateJsonPayload(string base64Image)
     // {
@@ -199,19 +216,5 @@ public class ChatGPTImage : MonoBehaviour
     //     return payload.ToString();
     // }
 
-    string CreateJsonPayload(string base64Image)
-    {
-        JObject payload = new JObject
-        {
-            ["model"] = "dall-e-3",
-            // ["prompt"] = "Generate a white cat",
-            ["prompt"] = "There are nine waste timbers in the image: Cube7(15cm * 10cm * 48cm), Cube(10cm * 8cm * 153cm), Cube1(20cm * 7cm * 225cm), Cube7(15cm * 10cm * 48cm), Cube8(50cm * 12cm * 130cm), Cube9(22cm * 6cm * 35cm), Cube6(26cm * 14cm * 117cm), Cube2(18cm * 7cm * 150cm), Cube4(40cm * 18cm * 52cm), and Cube5(33cm * 10cm * 25cm). How would you like to use these waster timbers to design a furniture? Can you explain what furniture you can design based on these timbers and provide detailed steps to assemble your timbers together for the designed furniture? Can you give the image of the designed furniture?",
-            ["size"] = "1024x1024",
-            ["quality"] = "standard",
-            ["response_format"] = "b64_json",
-            ["n"] = 1
-        };
-        return payload.ToString();
-    }
 }
 
