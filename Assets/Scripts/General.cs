@@ -8,6 +8,12 @@ public class General : MonoBehaviour
     public TMP_Text dimensionText;
     void Start()
     {
+        Renderer renderer = GameObject.Find("Image-Display").GetComponent<Renderer>();
+
+        // Material material = Resources.Load<Material>("Image/image");
+
+        renderer.material.mainTexture = null;
+
         // You can tag your cubes with a specific tag and iterate only those
         // For example, if you tagged them as 'Timber', you can find them like this:
         GameObject[] timbers = GameObject.FindGameObjectsWithTag("Timber");

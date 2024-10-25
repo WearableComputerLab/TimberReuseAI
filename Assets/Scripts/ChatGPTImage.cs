@@ -14,7 +14,7 @@ public class ChatGPTImage : MonoBehaviour
     // Replace with your API key
     private string apiKey = "sk-svcacct-z8VX82FEAdKZFUXa9VP_0TL-FebfLtfTzdcsC28n7sW1tVsZlrGVQzuByntUqz2CjT3BlbkFJtj9rJN651CtmGSu5Sftj-stFl7lQPVRV8htxkv8nQySGKCBEn1cyy3kzmIxTKn_JgA";
     // private string apiURL = "https://api.openai.com/v1/chat/completions";
-    private string apiURL = "https://api.openai.com/v1/images/generations	";
+    private string apiURL = "https://api.openai.com/v1/images/generations";
 
 
     public Texture2D inputImage;
@@ -22,14 +22,19 @@ public class ChatGPTImage : MonoBehaviour
     private Texture2D generatedImage;
 
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        // Load an image from your resources (make sure to place the image in the Resources folder)
-        // Texture2D image = Resources.Load<Texture2D>("path_to_your_image");
-        StartCoroutine(SendImageToChatGPT(inputImage));
+    // // Start is called before the first frame update
+    // void Start()
+    // {
+    //     // Load an image from your resources (make sure to place the image in the Resources folder)
+    //     // Texture2D image = Resources.Load<Texture2D>("path_to_your_image");
+    //     StartCoroutine(SendImageToChatGPT(inputImage));
 
-        // StartCoroutine(DisplayGenerativeImage());
+    //     // StartCoroutine(DisplayGenerativeImage());
+    // }
+
+    public void SendImageRequest()
+    {
+        StartCoroutine(SendImageToChatGPT(inputImage));
     }
 
 
@@ -104,7 +109,7 @@ public class ChatGPTImage : MonoBehaviour
 
     void DisplayGenerativeImage()
     {
-        Renderer renderer = GameObject.Find("GenerativeDesign").GetComponent<Renderer>();
+        Renderer renderer = GameObject.Find("Image-Display").GetComponent<Renderer>();
 
         // Material material = Resources.Load<Material>("Image/image");
 
